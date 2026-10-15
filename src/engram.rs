@@ -1,12 +1,17 @@
 pub struct Engram {
+    id: u32,
     tags: [u32;32], // 128 byte mf
     data: [u128;1024] //16 kb file
     // 16 512 byte for one file. Is it too much? I mean I cant change it, its locked, I can have thousands of files with 1 byte data and thats bad I think?
 }
 
 impl Engram {
-    pub fn create(new_tags: [u32;32], new_data: [u128;1024]) -> Self {
-        Engram {tags:new_tags, data:new_data}
+    pub fn get_id(&self) -> u32 {
+        self.id
+    }
+
+    pub fn create(new_id: u32, new_tags: [u32;32], new_data: [u128;1024]) -> Self {
+        Engram {id: new_id, tags: new_tags, data: new_data,}
     }
 
     pub fn view(&self) -> &[u128;1024] {

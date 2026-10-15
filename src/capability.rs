@@ -1,5 +1,7 @@
+use crate::engram::Engram;
+//shitty code
 pub struct Capability {
-    engram_id: u32, // unused for now, will be in actor.rs
+    engram_id: u32,
     keys: u8, 
 }
 
@@ -14,11 +16,15 @@ impl Capability {
         }
     }
     
-    pub fn check(&self) -> bool {
+    pub fn check<'a>(&self, engram: &'a Engram) -> Option<&'a [u128; 1024]> {
+        if self.engram_id != engram.get_id() {
+            return None;
+        }
+
         if (self.keys & 0b01) != 0 {
-            true
+            Some(engram.view())
         } else {
-            false
+            None
         }
     }
 }
