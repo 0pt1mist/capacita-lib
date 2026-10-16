@@ -15,8 +15,8 @@ pub struct StorageManager {
 impl StorageManager {
     fn allocate(&mut self, total_size: usize) { 
         let hm_blocks:usize = total_size / BLOCK_SIZE;
-        for time in hm_blocks {
-            // not working because its usize and not u32
+        for _ in 0..hm_blocks { // goddamit
+            
         }
     }
 
