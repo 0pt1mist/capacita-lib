@@ -1,4 +1,4 @@
-// "Take a deep breath Craig"
+
 const EOF: u32 = u32::MAX;
 const BLOCK_SIZE: usize = 512;
 
