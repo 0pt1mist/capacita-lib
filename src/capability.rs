@@ -23,7 +23,8 @@ impl Capability {
         }
 
         if (self.keys & 0b01) != 0 {
-            Some(engram.view()) // If capability have view rights, we are using engram.view()
+            // Some(engram.view()) // If capability have view rights, we are using engram.view() <<<< Deprecated
+            None
         } else {
             None
         }
