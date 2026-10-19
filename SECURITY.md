@@ -10,4 +10,4 @@ No version right now supported with security updates.
 
 ## Reporting a Vulnerability
 
-Just file an issue
+Just file an issue "Bug report"
