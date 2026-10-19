@@ -25,13 +25,19 @@ Inter-process communication relies on static ring buffers of a fixed size (16 sl
 Project Structure
 
 The project is structured into low-level modules linked together by a root lib.rs:
-├── src/
-│   ├── lib.rs          # Root module linking all components
-│   ├── engram.rs       # Metadata descriptors and asset passports
-│   ├── storage.rs      # Low-level block memory manager (FAT-like pool)
-│   ├── capability.rs   # Access control logic and C-Node structures
-│   └── actor.rs        # Actor traits and asynchronous mailbox rings
 
+------------------------
+lib.rs          # Root module linking all components
+
+engram.rs       # Metadata descriptors and asset passports
+
+storage.rs      # Low-level block memory manager (FAT-like pool)
+
+capability.rs   # Access control logic and C-Node structures
+
+actor.rs        # Actor traits and asynchronous mailbox rings
+
+------------------------
 Component Specifications (Current Codebase)
 
 
