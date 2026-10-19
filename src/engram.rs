@@ -21,7 +21,6 @@ impl Engram {
         &self.first_block_id
     }
 
-    // Deprecated shit lower, I warned you
     //pub fn delete(&self) {
     //    drop(Engram); <<<<<<<< Wont work btw
     //} Maybe I would need it sometime, like when engram dies
