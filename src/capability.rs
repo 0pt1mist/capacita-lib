@@ -2,7 +2,7 @@ use crate::engram::Engram;
 pub const MAX_CAPABILITIES: usize = 16;
 
 #[derive(Clone, Copy)]
-//shitty code
+
 pub struct Capability {
     engram_id: u32,
     keys: u8, // 0b00-None 0b01-View 0b10-Write 0b11-View and Write
@@ -11,7 +11,7 @@ pub struct Capability {
 }
 
 pub struct CNode {
-    pub slots: [Option<Capability>; MAX_CAPABILITIES]
+    pub slots: [Option<Capability>; MAX_CAPABILITIES],
 }
 
 impl Capability {
@@ -22,6 +22,14 @@ impl Capability {
             weight: 128,
             max_ttl: 0,
         }
+    }
+
+    pub fn get_engram_id(&self) -> u32 {
+        self.engram_id
+    }
+
+    pub fn get_weight(&self) -> u8 {
+        self.weight
     }
 
     pub fn rght_att(&mut self) {
@@ -58,20 +66,27 @@ impl CNode {
             }
         }
 
-        let mut victim_idx = 0;
+        let mut victim_idx = Option::<usize>::None;
         let mut min_weight = u8::MAX;
 
         for i in 0..MAX_CAPABILITIES {
             if let Some(cap) = &self.slots[i] {
-                if cap.weight < min_weight {
-                    min_weight = cap.weight;
-                    victim_idx = i; // the most unused cap is gonna die
+                if cap.get_weight() == 255 {
+                    continue;
+                }
+                if cap.get_weight() < min_weight {
+                    min_weight = cap.get_weight();
+                    victim_idx = Some(i); // the most unused cap is gonna die
                 }
             }
         }
 
-        self.slots[victim_idx] = Some(new_cap); // dead now
-        Some(victim_idx as u32)
+        if let Some(idx) = victim_idx {
+            self.slots[idx] = Some(new_cap); // dead now
+            Some(idx as u32)
+        } else {
+            None
+        }
     }
 
     pub fn check_and_use(&mut self, selector: u32, engram: &Engram, required_key: u8) -> bool { // New func to verify rights and use capability
@@ -97,7 +112,9 @@ impl CNode {
             }
         }
 
-        cap.weight = cap.weight.saturating_add(5); // If it was used, than its live a little more
+        if cap.weight < 255 {
+            cap.weight = cap.weight.saturating_add(5); // If it was used, than its live a little more
+        }
         self.slots[idx] = Some(cap);
         
         true

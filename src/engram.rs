@@ -3,7 +3,7 @@ const NO_SIZE: u32 = 0;
 
 pub struct Engram {
     id: u32,
-    tags: [u32;32], // 128 byte mf
+    tags: [u32; 32], // 128 byte mf
     first_block_id: u32,
     total_size: u32,
 }
@@ -13,8 +13,20 @@ impl Engram {
         self.id
     }
 
-    pub fn create(new_id: u32, new_tags: [u32;32]) -> Self { // Our core can create new engrams, with new id, and zero tags and no first block and no size
-        Engram {id: new_id, tags: new_tags, first_block_id: NO_BLOCK, total_size: NO_SIZE}
+    pub fn get_total_size(&self) -> u32 { //Updated functions to work with storage.rs and whole system
+        self.total_size
+    }
+
+    pub fn set_first_block_id(&mut self, new_id: u32) {
+        self.first_block_id = new_id;
+    }
+
+    pub fn set_total_size(&mut self, new_size: u32) {
+        self.total_size = new_size;
+    }
+
+    pub fn create(new_id: u32, new_tags: [u32; 32]) -> Self { // Our core can create new engrams, with new id, and zero tags and no first block and no size
+        Engram { id: new_id, tags: new_tags, first_block_id: NO_BLOCK, total_size: NO_SIZE }
     }
 
     pub fn view(&self) -> &u32 { // View self first block, just for now, without memory manager
@@ -26,7 +38,7 @@ impl Engram {
     //} Maybe I would need it sometime, like when engram dies
 
     pub fn give_tag(&mut self, new_tag: u32) {
-        for element in &mut self.tags   {
+        for element in &mut self.tags {
             if *element == 0 { // If we spot empty space inside tags array, we are adding there new tag
                 *element = new_tag;
                 break;
@@ -34,12 +46,12 @@ impl Engram {
         }
     }
 
-    pub fn view_tags(&self) -> &[u32;32] { // View self tags
+    pub fn view_tags(&self) -> &[u32; 32] { // View self tags
         &self.tags
     }
 
     pub fn delete_tag(&mut self, target_tag: u32) {
-        for element in &mut self.tags   {
+        for element in &mut self.tags {
             if *element == target_tag { // If we spot exactly the element we are looking for, we are deleting it, or, technically, making it 0
                 *element = 0;
                 break;
