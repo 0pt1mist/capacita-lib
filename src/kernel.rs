@@ -26,13 +26,13 @@ pub struct ActorControlBlock { // Only kernel struct, main descriptor
 }
 
 pub struct Kernel {
-    pub storage: StorageManager,
+    pub storage: *mut StorageManager,
     pub actors: [Option<ActorControlBlock>; MAX_ACTORS], // Only 32 actors for now
     pub current_actor_idx: usize, // Lact working actor uid
 }
 
 impl Kernel {
-    pub const fn new(storage_manager: StorageManager) -> Self { // Core starter
+    pub const fn new(storage_manager: *mut StorageManager) -> Self { // Core starter
         const NONE_ACB: Option<ActorControlBlock> = None;
         Kernel {
             storage: storage_manager,
@@ -44,7 +44,7 @@ impl Kernel {
     pub fn kill_and_reclaim(&mut self, actor_idx: usize) { // Let it crash, here we go
         if let Some(mut acb) = self.actors[actor_idx].take() {
             if let Some(tx) = acb.transaction {
-                self.storage.free_chain(tx.temporary_chain_start);
+                unsafe { (*self.storage).free_chain(tx.temporary_chain_start); }
             }
 
             let mut fresh_cnode = CNode { slots: [None; 16] };
@@ -138,7 +138,7 @@ impl Kernel {
             
             let first_block = *engram.view();
             let total_size = engram.get_total_size() as usize;
-            let read_bytes = self.storage.read_chain(first_block, buffer, total_size);
+            let read_bytes = unsafe { (*self.storage).read_chain(first_block, buffer, total_size) };
             return Ok(read_bytes);
         }
         Err(())
