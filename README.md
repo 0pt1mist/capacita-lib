@@ -1,10 +1,10 @@
 
-CapacitaOS Architecture and Technical Specification
+## CapacitaOS Architecture and Technical Specification
 
 CapacitaOS is an experimental asynchronous exokernel operating system architecture implemented entirely as a freestanding Rust library (#![no_std]). The system is specifically engineered for the hardware constraints and operational requirements of a mobile cyberdeck powered by a dual-core RISC-V ESP32-P4 microcontroller (400 MHz, 32 MB PSRAM, 16 MB SPI Flash).
 The core design centers on strict architectural minimalism and systemic isolation. The kernel does not supervise user processes, fix logic bugs, or manage application errors. High availability and runtime stability are achieved through an aggressive "Let It Crash" lifecycle policy: the core kernel safely multiplexes raw physical resources and provides secure execution boundaries, eliminating abstraction taxes and dynamic validation overhead inside the privileged execution path.
 
-Architectural Principles
+## Architectural Principles
 
 
 1. Neuromorphic Capability Security (Synaptic Access Control)
@@ -29,15 +29,22 @@ To safeguard storage integrity under the "Let It Crash" philosophy, the kernel e
 Project Structure
 
 The repository is organized as a modular Rust crate managed by a root lib.rs:
-├── src/
-│   ├── lib.rs          # Root module linking and exporting all components
-│   ├── engram.rs       # Metadata descriptors and asset passports
-│   ├── storage.rs      # Low-level physical block allocation and FAT-like manager
-│   ├── capability.rs   # Synaptic access control logic and C-Node structures
-│   ├── actor.rs        # Actor traits and asynchronous mailbox rings
-│   └── kernel.rs       # Core execution engine, scheduler, and O(1) syscall routing
 
-Component Specifications
+src/
+
+lib.rs          # Root module linking and exporting all components
+
+engram.rs       # Metadata descriptors and asset passports
+
+storage.rs      # Low-level physical block allocation and FAT-like manager
+
+capability.rs   # Synaptic access control logic and C-Node structures
+
+actor.rs        # Actor traits and asynchronous mailbox rings
+
+kernel.rs       # Core execution engine, scheduler, and O(1) syscall routing
+
+## Component Specifications
 
 
 lib.rs
@@ -84,3 +91,18 @@ The privileged management environment that drives the runtime and protects syste
 • kill_and_reclaim: An atomic system destructor that intercepts Actor faults, releases raw blocks flagged by incomplete transactions (TransactionRecord), and recreates the target Actor with an empty mailbox while preserving its immune capabilities (weight == 255).
 • schedule: A cooperative Round-Robin scheduler that cycles through the Actor array. It decrements and honors spam_penalty_ticks bans, routes queued mail via mailbox.pop(), and forwards signals directly to the user-space trait implementation.
 • sys_send & sys_read: High-speed system call handlers providing deterministic O(1) execution time. They bypass linear scanning loops through direct array indexing, performing access validation and resource delivery instantly.
+
+## Local Verification (Hardwareless Testing)
+
+Since CapacitaOS is engineered as a freestanding, hardware-agnostic core library, the entire architecture can be verified locally on your development machine via standard unit tests:
+
+```bash
+cargo test
+```
+
+The integrated `tests/runtime_test.rs` harness instantiates a multi-actor simulation setup:
+1. **Actor 0 (Spammer)** dispatches asynchronous IPC frames to **Actor 1 (Victim)**.
+2. The kernel routes messages with O(1) complexity via direct slot arrays.
+3. Once the Victim's mailbox boundary is broken (exceeding the 16-slot ring limit), the kernel triggers a **Spam Rejection Error**.
+4. The kernel safely penalizes the sender by injecting `spam_penalty_ticks` directly into Actor 0's context block, temporarily throttling it from the scheduler карусель loop while Actor 1 remains active and unpenalized.
+
