@@ -57,7 +57,6 @@ pub mod capability;
 pub mod actor;
 pub mod storage;
 pub mod kernel;
-Используйте код с осторожностью.
 
 engram.rs
 
