@@ -103,5 +103,5 @@ The integrated `tests/runtime_test.rs` harness instantiates a multi-actor simula
 1. **Actor 0 (Spammer)** dispatches asynchronous IPC frames to **Actor 1 (Victim)**.
 2. The kernel routes messages with O(1) complexity via direct slot arrays.
 3. Once the Victim's mailbox boundary is broken (exceeding the 16-slot ring limit), the kernel triggers a **Spam Rejection Error**.
-4. The kernel safely penalizes the sender by injecting `spam_penalty_ticks` directly into Actor 0's context block, temporarily throttling it from the scheduler карусель loop while Actor 1 remains active and unpenalized.
+4. The kernel safely penalizes the sender by injecting `spam_penalty_ticks` directly into Actor 0's context block, temporarily throttling it from the scheduler carousel loop while Actor 1 remains active and unpenalized.
 
